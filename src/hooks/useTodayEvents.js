@@ -1,10 +1,11 @@
-
 import { useState, useEffect } from 'react';
 
 export const useTodayEvents = () => {
   const [events, setEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [displayCount, setDisplayCount] = useState(20); // Show 20 events initially
 
   useEffect(() => {
     const fetchHistoricalEvents = async () => {
@@ -23,12 +24,10 @@ export const useTodayEvents = () => {
         
         const data = await response.json();
         
-        // Sort events by year (newest first) and limit to 10 events
-        const sortedEvents = data.events
-          .sort((a, b) => b.year - a.year)
-          .slice(0, 10);
-        
-        setEvents(sortedEvents);
+        // Sort events by year (newest first)
+        const sortedEvents = data.events.sort((a, b) => b.year - a.year);
+        setAllEvents(sortedEvents);
+        setEvents(sortedEvents.slice(0, displayCount));
         setError(null);
       } catch (err) {
         console.error('Error fetching historical events:', err);
@@ -41,5 +40,13 @@ export const useTodayEvents = () => {
     fetchHistoricalEvents();
   }, []);
 
-  return { events, loading, error };
+  const loadMore = () => {
+    const newCount = displayCount + 20;
+    setDisplayCount(newCount);
+    setEvents(allEvents.slice(0, newCount));
+  };
+
+  const hasMore = events.length < allEvents.length;
+
+  return { events, loading, error, loadMore, hasMore };
 };

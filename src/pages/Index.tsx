@@ -5,9 +5,10 @@ import Loader from '../components/Loader';
 import { useTodayEvents } from '../hooks/useTodayEvents';
 import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  const { events, loading, error } = useTodayEvents();
+  const { events, loading, error, loadMore, hasMore } = useTodayEvents();
   const today = new Date();
 
   if (loading) {
@@ -51,9 +52,9 @@ const Index = () => {
                 <p className="text-gray-800 dark:text-gray-200 flex-grow">
                   {event.description}
                 </p>
-                {event.wikipedia && (
+                {event.wikipedia && event.wikipedia.length > 0 && (
                   <a
-                    href={event.wikipedia}
+                    href={event.wikipedia[0].wikipedia}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 inline-block text-sm text-primary hover:text-primary/80 
@@ -66,6 +67,18 @@ const Index = () => {
             </div>
           ))}
         </div>
+
+        {hasMore && (
+          <div className="flex justify-center mt-8">
+            <Button 
+              onClick={loadMore}
+              variant="outline"
+              className="px-8 py-2 text-lg hover:bg-primary hover:text-primary-foreground transition-colors"
+            >
+              Load More Events
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
